@@ -1,8 +1,8 @@
 {
   "rules": {
     "samples": {
-      ".read": "auth != null && auth.token.email === 'rugs@counter-room.local'",
-      ".write": "auth != null && auth.token.email === 'rugs@counter-room.local'",
+      ".read": "auth != null && (auth.token.email === 'rugs@counter-room.local' || auth.token.email === 'ankush@counter-room.local')",
+      ".write": "auth != null && (auth.token.email === 'rugs@counter-room.local' || auth.token.email === 'ankush@counter-room.local')",
       "$sampleId": {
         "id": {
           ".validate": "newData.val() === $sampleId"
@@ -11,6 +11,10 @@
           ".validate": "newData.val() === 'in-room' || newData.val() === 'issued'"
         }
       }
+    },
+    "employees": {
+      ".read": "auth != null && (auth.token.email === 'rugs@counter-room.local' || auth.token.email === 'ankush@counter-room.local')",
+      ".write": "auth != null && (auth.token.email === 'rugs@counter-room.local' || auth.token.email === 'ankush@counter-room.local')"
     }
   }
 }
