@@ -1,8 +1,8 @@
 {
   "rules": {
     "samples": {
-      ".read": "auth != null",
-      ".write": "auth != null",
+      ".read": "auth != null && auth.token.email === 'rugs@counter-room.local'",
+      ".write": "auth != null && auth.token.email === 'rugs@counter-room.local'",
       "$sampleId": {
         "id": {
           ".validate": "newData.val() === $sampleId"
