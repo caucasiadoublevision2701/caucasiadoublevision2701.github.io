@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#000000">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <style>
     :root {
       --ink: #000000; --ink-soft: #161616; --paper: #ffffff; --paper-dim: #f3f3f3;
@@ -172,9 +175,10 @@
 
   <div id="modalRoot"></div>
 
-<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-database-compat.js"></script>
+<!-- Firebase 8.x keeps the namespaced API and ES5-compatible distribution needed by iOS 12 Safari. -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script>
 /* ---------------- state ---------------- */
 let SAMPLES = [];
@@ -381,7 +385,14 @@ async function loginAdmin(event) {
   try {
     await firebase.auth().signInWithEmailAndPassword(authEmail, password);
   } catch (err) {
-    errorEl.textContent = 'Invalid username or password.';
+    const code = err && err.code ? String(err.code) : '';
+    if (code.indexOf('wrong-password') !== -1 || code.indexOf('invalid-credential') !== -1 || code.indexOf('user-not-found') !== -1) {
+      errorEl.textContent = 'Invalid username or password.';
+    } else if (code.indexOf('network-request-failed') !== -1) {
+      errorEl.textContent = 'Safari could not reach Firebase. Check internet access, turn off content blockers for this site, and try again.';
+    } else {
+      errorEl.textContent = 'Sign-in failed' + (code ? ' (' + code.replace('auth/', '') + ')' : '') + '. Please reload and try again.';
+    }
   } finally {
     button.disabled = false; button.textContent = 'Sign in';
   }
