@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    :root {
+      --ink: #14232C; --ink-soft: #1C2E38; --paper: #F1EAD9; --paper-dim: #E7DEC8;
+      --paper-line: #CFC3A3; --text-on-ink: #EDE6D6; --text-on-ink-dim: #9DAAAE;
+      --text-on-paper: #1F2A24; --text-on-paper-dim: #5B5142;
+      --red: #9B3B3B; --amber: #B8862E; --green: #3F6B52; --kraft: #8B7355;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--ink); color: var(--text-on-ink); font-family: -apple-system, system-ui, sans-serif; }
+    h1, .display { font-family: Georgia, 'Times New Roman', serif; }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 16px; padding-bottom: 60px; }
+    .row { display: flex; align-items: center; gap: 8px; }
+    .between { justify-content: space-between; }
+    .card { background: var(--paper); color: var(--text-on-paper); border-radius: 4px; padding: 12px; }
+    .muted { color: var(--text-on-paper-dim); font-size: 12px; }
+    .mutedInk { color: var(--text-on-ink-dim); font-size: 12px; }
+    input, select, textarea {
+      width: 100%; font-size: 14px; padding: 8px 10px; border-radius: 4px;
+      border: 1px solid var(--paper-line); background: var(--paper-dim); color: var(--text-on-paper);
+      font-family: inherit;
+    }
+    label.field { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .04em; color: var(--text-on-paper-dim); margin-bottom: 4px; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    button { cursor: pointer; border: none; font-family: inherit; font-weight: 700; border-radius: 4px; }
+    .btn-primary { background: var(--ink); color: var(--text-on-ink); padding: 10px; width: 100%; font-size: 14px; }
+    .btn-primary:disabled { opacity: .5; cursor: default; }
+    .btn-amber { background: var(--amber); color: var(--ink); padding: 8px 12px; font-size: 12px; }
+    .btn-green { background: var(--green); color: var(--paper); padding: 8px 12px; font-size: 12px; }
+    .btn-ghost { background: var(--paper-dim); color: var(--text-on-paper); padding: 8px 12px; font-size: 12px; }
+    .btn-red { background: var(--red); color: var(--paper); padding: 8px 12px; font-size: 12px; }
+    .btn-icon { background: none; padding: 4px; color: var(--text-on-paper-dim); }
+    .tabs { display: flex; gap: 4px; overflow-x: auto; margin-top: 14px; }
+    .tab { padding: 8px 12px; font-size: 13px; font-weight: 700; white-space: nowrap; background: transparent;
+      color: var(--text-on-ink-dim); border-bottom: 2px solid transparent; border-radius: 6px 6px 0 0; }
+    .tab.active { background: var(--paper); color: var(--text-on-paper); border-bottom: 2px solid var(--red); }
+    .stampBadge { display: inline-block; padding: 1px 8px; font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .06em; border-radius: 3px; border: 2px dashed; transform: rotate(-4deg); }
+    .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 1px solid var(--text-on-paper-dim); vertical-align: middle; }
+    .thumb { width: 56px; height: 56px; object-fit: cover; border-radius: 3px; border: 1px solid var(--paper-line); flex-shrink: 0; }
+    .thumbEmpty { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;
+      background: var(--paper-dim); border-radius: 3px; color: var(--text-on-paper-dim); font-size: 20px; flex-shrink: 0; }
+    .sampleRow { display: flex; gap: 10px; background: var(--paper); border-radius: 4px; padding: 10px; margin-bottom: 8px; }
+    .modalBg { position: fixed; inset: 0; background: rgba(0,0,0,.65); display: flex; align-items: center;
+      justify-content: center; padding: 16px; z-index: 50; }
+    .modal { width: 100%; max-width: 380px; max-height: 85vh; overflow-y: auto; background: var(--paper);
+      color: var(--text-on-paper); border-radius: 6px; padding: 16px; }
+    .photoThumb { position: relative; display: inline-block; margin: 0 6px 6px 0; }
+    .photoThumb img { width: 64px; height: 64px; object-fit: cover; border-radius: 3px; border: 1px solid var(--paper-line); }
+    .photoThumb .rm { position: absolute; top: -6px; right: -6px; width: 18px; height: 18px; border-radius: 50%;
+      background: var(--red); color: #fff; font-size: 11px; line-height: 18px; text-align: center; padding: 0; }
+    .addPhotoBtn { width: 64px; height: 64px; display: inline-flex; flex-direction: column; align-items: center;
+      justify-content: center; background: var(--paper-dim); border: 1px dashed var(--paper-line); border-radius: 3px;
+      color: var(--text-on-paper-dim); font-size: 10px; }
+    .statCard { background: var(--paper); border-radius: 4px; padding: 10px; text-align: center; }
+    .statVal { font-size: 20px; font-weight: 700; font-family: Georgia, serif; }
+    .statLabel { font-size: 9px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-on-paper-dim); margin-top: 2px; }
+    .empty { text-align: center; padding: 40px 12px; color: var(--text-on-ink-dim); font-size: 13px; }
+    .banner { background: var(--paper); border-left: 4px solid var(--amber); border-radius: 4px; padding: 10px 14px; margin-bottom: 12px; }
+    .errBanner { background: #3a1f1f; border-left: 4px solid var(--red); border-radius: 4px; padding: 10px 14px; margin-bottom: 12px; color: #f2d9d9; font-size: 13px; }
+    .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .avatarEmpty { width: 40px; height: 40px; border-radius: 50%; background: var(--paper-dim); display: flex;
+      align-items: center; justify-content: center; color: var(--text-on-paper-dim); flex-shrink: 0; }
+    .loading { text-align: center; padding: 60px 0; color: var(--text-on-ink-dim); }
+    a { color: inherit; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div style="display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:8px; margin-top:8px;">
+      <img src="data:image/png;base64,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ZWVlDz74YHl5uTBkzn53r5ow+MIl7mBewwmAAF599VU3Jb/85S8l7J2Tk5OTkyO52rIRi8W01uLDy879+/d3E7xq1SrpcSc7RCIRoUKSyWR3esUpUCcj4/F4IpEQpiDcvmUHYTEAy5cvlys3xowdO1ba1bqAksuSOPvss90qlu+++24qlfras95Vp7bLBroZsMqCOPAQaBhlmSx3wotDOGNiS9b32NfWeABIM32xwAMzyIAMMbNlzRS1UKAME1qbx3lbbh/Fjx6d859H9r3wwPxhCV2qKN/aXJOJGUt+IAvaKA669EJ3CPA8b926dXfeeadbCvnoo49euHDhj3/8YwnzCaSc55+Tk3P44YffdtttEnFDqKpxBzm0ixcvXr16tWQKHXnkkf/2b/8meTXt7e0dHR2pVEo20um0WGnObpNULbnagw46KAiC9vZ24TikaGDkyJG33nqrBK2732A6nZYQEDNXVlaOHTs2CIJMJiNMQRd12d1rkfaia9ascfmMjz322IgRI8JsSDQanT59+r/8y7+4lI0//elPrk/x15mBaDshq9hGAAPErJXqSaJAMYi1y6T5wnv8oqKNA2JDUIrSSpnOXCBFIFaAsmRIeTBgsoCNGsvQxof1Oyp16owBmeP7q/ZDkpuaTVWdqWmNbvH1yna7bEtjG8tiuV9yOpyCkODMHXfcMWLEiLPOOku6l++///7333//rbfeumzZsnXr1m3cuLG0tLSioqK0tHT48OFlZWVKqTfeeKNLjW54O0zbep7X2Nh42223yRr1xpibb775hz/84fPPP//+++83NTU1NzcXFxcXFxcfdNBB//zP//zAAw/8+7//uyMI0Lky/M9+9jNjzBtvvFFTU5OXl9e/f/9jjjnm0ksvTSaT3fWdQGfz5s2rV6/u06ePtO655557BgwYsGbNmkQi0bdv38cff1wswh71lDDGdXV1d91116xZs4SFGTVq1JIlS956661Vq1Y1NjYOHTr00EMP/c53vuOiRmvWrHniiSe+ibxfz8UALdjCKkmmZsUGyhCxLCsammW3DiWDAApsRFNgZOX3L7KtM1bBAtawAqwY/RFmAgVMRhLMlG841V6oVZGylQlvxJAC4yVsIjpva+TDFxrbpB86d/VqHQgEEBdccEEqlTr//PNjsZiIkLKyshNPPLH7rRpjOjo6wsSgiIRwQDMsGISbmDNnzrBhw6699lpxLYcNGybrvaFzyTd3NtF9Av1FixY9++yzp512WiaTycvLu/nmm40x1dXVBQUFJSUl7hDf912kGaGW1el0es6cOUcddZRkkg0ePHjWrFmOpumy1rh06nNMjdhtWusHHnjg0EMPnTZtmoTqY7HYxIkTJ06cGP52SR2oq6s777zzpHzBncTRzjtgKOSr3SG9aUklHiUTAqIAyMTiQbLUzylS8RLKKQ5yC0xufpefIPtvAeeWmHgh5ySQk8+edloyiCWDnEIkEkEi1+Qkg5y8ICdpkgWZZH4mL5nJiwe5SZtTiGSxzSkOEkXpWD4reH6zl27QtiOU192r3y7WUiaTueCCC84777zly5eHl+Tofs+yDrLrViKWUywW8zzPBd26pDPIr9ddd93555+/atWq8Mnd0lduuOxZcScvvPDCF154waUraq2HDBni4PX5559fdtllksjqeZ4QUfLOCEYffPDBBx98UEy38L2EAxii/T3Pk3+FkQ9zqhdeeOENN9ywffv2eDzuhKU7VSQSiUajy5YtO/XUU5csWeKSE0V+5+bmivFXUFDgcgXcV8vZ8vPz3TPsHr/6Uo6rFN0ywQIfNmQe/6TVZDJRA2U52KFetkwEVmAbbf24Ie2qLN+ra/8/pCKGA/LBWsEQfEssoo0BhQyZbO6hQTamCVgTUUtbTUd2encqbV8p9dhjjz3zzDPjxo074ogjRo8eXVFRUVRUVF5eLsG4TZs2VVVVyRIvH374oUzAtm3bbrjhBuk0Hu6v2f38WutHHnlk3rx5EydOPPbYY4cPH56TkzNgwIDa2tp0Or158+YPP/xw6dKlCxcuFATIUQ0NDWecccaUKVPOOOOMIUOG9O/fv66uLpPJVFVVvfrqqwsWLJDGwcXFxbJGTlhaCP374x//eMGCBWefffagQYP69u1bW1tbX1//3HPPtbS0OGHz5ptv3nDDDb7vx2IxOYnrwiLj17/+9TPPPDNhwoSJEycOGDCgsLCwuLi4pqamra1t+fLlr7/++muvvdbW1uZ6mwmGamtr//Vf/1Ucly1btkjyT1jAy6X+/ve/X7lypYRTly5d2qMkI6jONa1Isr28OGfywamdW9fIABrQgAE6QH4nwx9HFpnqy+xG1s2UNcJDijdbIiBuPJBRCmyJicE74zA7h8jJJxFRQrWHm7h2iep0oaC6GyLhdUDCISax691qN128OafEXRaypMU61dMlNbk7exdOARdJJvqoS5SpNxo2HLoOX7l7LGHbQBgW973d0+x6ZPB3MiGPQNk1mDnL5nvE0GwCJbhT2LEkISLLHshHDMoSZzxmA89mHVPqPNyVjnNoed3OMnJlwZasCDIGEciStYBi3ol76Hw0rt1Sj6v8uaKMLmHy8Foe3eEV5m+FROj+WCXxQfL1uhwiE9wlcd6lertWri5sFeZyXZa9O5urJ3ClJY6MlQPlJF0qBuSV6J5cLlfioNaFzg1r1bDfHa6IdnSji+r2JMMIijuXncmWYygFsmTwpYhSr9OrmAlkEGFliI0HBJ1NhikbhPrCPfiC4CJSrAG2sAAUmKEYishyJ33CXyo/+RsIwLBXGJ7vLg+xC/Xf2znDu4WDel0stjBewznvXTAXDh53PxZfXiC3O7fuai663EgXEdh95+5XEl5Np8tDCF9Dj0Uu+HJz7vDdYe/YO/aOvWPv2Dv2jr1j79g79o49f/w/p3q1SdfyhxAAAAAASUVORK5CYII=" alt="Rugs Creation" style="height:32px; width:auto; justify-self:start;">
+      <h1 style="font-size:19px; margin:0; text-align:center;">Counter Room Register</h1>
+      <div class="row" style="gap:2px; justify-self:end;">
+        <button class="btn-icon" onclick="refreshAll()" style="font-size:22px;">⟳</button>
+      </div>
+    </div>
+    <p class="mutedInk" id="statusLine">Loading…</p>
+    <div id="errorBanner"></div>
+
+    <div class="row" style="margin-top:10px;">
+      <input id="myNameInput" placeholder="Your name" style="background:var(--ink-soft); color:var(--text-on-ink); border-color:var(--kraft);">
+      <button class="btn-amber" onclick="saveMyName()">Set</button>
+    </div>
+
+    <div class="grid4" id="dashboardBar" style="margin-top:14px;"></div>
+
+    <div id="pendingBanner"></div>
+
+    <div class="tabs" id="tabBar">
+      <button class="tab active" data-tab="register" onclick="switchTab('register')">📋 Register</button>
+      <button class="tab" data-tab="log" onclick="switchTab('log')">＋ Log Sample</button>
+      <button class="tab" data-tab="action" onclick="switchTab('action')">📦 Issue / Return</button>
+      <button class="tab" data-tab="supervisor" onclick="switchTab('supervisor')">🛡 Supervisor</button>
+    </div>
+
+    <div id="tabContent" style="margin-top:14px;">
+      <div class="loading">Loading register…</div>
+    </div>
+  </div>
+
+  <div id="modalRoot"></div>
+
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-database-compat.js"></script>
+<script>
+/* ---------------- state ---------------- */
+let SAMPLES = [];
+let MY_NAME = '';
+let CURRENT_TAB = 'register';
+const SEAL_TYPES = [{ label: 'Green', color: '#3F6B52' }, { label: 'Red', color: '#9B3B3B' }, { label: 'White', color: '#FFFFFF' }];
+const SAMPLE_TYPES = ['PP Sample', 'Initial Sample', 'TOP Sample', 'GOLD Seal'];
+const DEPARTMENTS = ['Merchandising', 'Quality', 'Production', 'Other'];
+let logPhotos = [];
+let issuePhotoCache = {}; // sampleId -> dataUrl
+let filters = { q: '', buyer: 'all', merchant: 'all', sampleType: 'all', status: 'all' };
+let actionFilters = { q: '', buyer: 'all', merchant: 'all' };
+
+/* ---------------- Firebase backend ---------------- */
+// Firebase Console -> Project settings -> Your apps -> Web app -> SDK setup and configuration.
+// Replace every placeholder below with the values from your Firebase web app.
+const firebaseConfig = {
+  apiKey: 'AIzaSyCNHasUhdplmxQHF8l-RfKRa5MZWeugbcI',
+  authDomain: 'counter-room-sample-register.firebaseapp.com',
+  databaseURL: 'https://counter-room-sample-register-default-rtdb.asia-southeast1.firebasedatabase.app',
+  projectId: 'counter-room-sample-register',
+  storageBucket: 'counter-room-sample-register.firebasestorage.app',
+  messagingSenderId: '95116929464',
+  appId: '1:95116929464:web:07037591ae42065811c74d'
+};
+
+let firebaseDb = null;
+let firebaseReady = null;
+async function getFirebaseDb() {
+  if (firebaseConfig.apiKey.indexOf('PASTE_') === 0) {
+    throw new Error('Firebase is not configured yet. Add your Firebase web configuration near the top of index.html.');
+  }
+  if (!firebaseReady) {
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    firebaseReady = firebase.auth().signInAnonymously().then(function () {
+      firebaseDb = firebase.database();
+      return firebaseDb;
+    });
+  }
+  return firebaseReady;
+}
+
+async function apiCall(fn, args) {
+  const db = await getFirebaseDb();
+  const samplesRef = db.ref('samples');
+  args = args || [];
+
+  if (fn === 'getSamples') {
+    const snap = await samplesRef.once('value');
+    const value = snap.val() || {};
+    return Object.keys(value).map(function (id) { return Object.assign({ id: id }, value[id]); });
+  }
+  if (fn === 'getDashboard') {
+    const samples = await apiCall('getSamples', []);
+    const issued = samples.filter(function (s) { return s.status === 'issued'; });
+    return {
+      total: samples.length,
+      inStore: samples.length - issued.length,
+      out: issued.length,
+      overdue: issued.filter(function (s) { return s.expectedReturn && Date.now() > s.expectedReturn; }).length
+    };
+  }
+  if (fn === 'addSample') {
+    const sample = Object.assign({}, args[0]);
+    const ref = samplesRef.push();
+    sample.id = ref.key;
+    sample.status = 'in-room';
+    sample.loggedAt = Date.now();
+    sample.history = [{ type: 'logged', by: sample.loggedBy, at: sample.loggedAt }];
+    await ref.set(sample);
+    return sample;
+  }
+  if (fn === 'updateSample') {
+    const id = args[0], patch = args[1] || {};
+    await samplesRef.child(id).update(patch);
+    const updated = await samplesRef.child(id).once('value');
+    if (!updated.exists()) throw new Error('Sample not found');
+    return updated.val();
+  }
+  if (fn === 'deleteSample') {
+    await samplesRef.child(args[0]).remove();
+    return true;
+  }
+  if (fn === 'issueSample') {
+    const id = args[0], issuedTo = args[1], department = args[2], expectedReturn = args[3];
+    const note = args[4], takerPhoto = args[5] || null, byWhom = args[6] || issuedTo;
+    const ref = samplesRef.child(id);
+    const result = await ref.transaction(function (sample) {
+      if (!sample) return sample;
+      const at = Date.now();
+      sample.status = 'issued';
+      sample.issuedTo = issuedTo;
+      sample.department = department;
+      sample.issuedAt = at;
+      sample.expectedReturn = expectedReturn;
+      sample.issueNote = note;
+      sample.takerPhoto = takerPhoto;
+      sample.history = (sample.history || []).concat([{
+        type: 'issued', to: issuedTo, department: department, by: byWhom,
+        at: at, expectedReturn: expectedReturn, note: note
+      }]);
+      return sample;
+    });
+    if (!result.committed || !result.snapshot.exists()) throw new Error('Sample not found');
+    return result.snapshot.val();
+  }
+  if (fn === 'returnSample') {
+    const id = args[0], returnedBy = args[1];
+    const ref = samplesRef.child(id);
+    const result = await ref.transaction(function (sample) {
+      if (!sample) return sample;
+      const at = Date.now();
+      const previousHolder = sample.issuedTo || '';
+      sample.status = 'in-room';
+      sample.returnedAt = at;
+      sample.returnedBy = returnedBy;
+      sample.history = (sample.history || []).concat([
+        { type: 'returned', by: returnedBy, at: at, from: previousHolder }
+      ]);
+      return sample;
+    });
+    if (!result.committed || !result.snapshot.exists()) throw new Error('Sample not found');
+    return result.snapshot.val();
+  }
+  throw new Error('Unknown Firebase operation: ' + fn);
+}
+
+/* ---------------- global error handling ---------------- */
+// Route every database failure through here so an error is never silently swallowed.
+function showError(err, context) {
+  const msg = (err && err.message) ? err.message : String(err);
+  console.error('Server error' + (context ? ' [' + context + ']' : '') + ':', err);
+  document.getElementById('errorBanner').innerHTML =
+    '<div class="errBanner"><b>Something went wrong' + (context ? ' (' + esc(context) + ')' : '') + ':</b><br>' + esc(msg) + '</div>';
+  // also surface it as an alert so it can't be missed if the banner is off-screen
+  alert((context ? context + ' failed: ' : 'Error: ') + msg);
+}
+function clearError() {
+  const el = document.getElementById('errorBanner');
+  if (el) el.innerHTML = '';
+}
+function onErr(context) {
+  return function (err) { showError(err, context); };
+}
+
+/* ---------------- boot ---------------- */
+// "My name" is a personal preference, not shared register data, so it's
+// remembered per-browser via localStorage rather than round-tripping to
+// the Apps Script backend (which has no reliable per-visitor identity
+// for anonymous cross-origin requests anyway).
+const MY_NAME_KEY = 'crr_myName';
+window.onload = function () {
+  MY_NAME = localStorage.getItem(MY_NAME_KEY) || '';
+  document.getElementById('myNameInput').value = MY_NAME;
+  refreshAll();
+};
+
+async function refreshAll() {
+  document.getElementById('statusLine').textContent = 'Refreshing…';
+  try {
+    const data = await apiCall('getSamples', []);
+    clearError();
+    SAMPLES = data.slice().reverse(); // newest-logged sample first, since the sheet appends new rows at the bottom
+    document.getElementById('statusLine').textContent = 'Every sample logged, sealed, and accounted for.';
+    renderDashboard();
+    renderPendingBanner();
+    renderTab();
+  } catch (err) {
+    document.getElementById('statusLine').textContent = 'Error loading samples — see below.';
+    showError(err, 'Loading samples');
+  }
+}
+
+function saveMyName() {
+  const v = document.getElementById('myNameInput').value.trim();
+  localStorage.setItem(MY_NAME_KEY, v);
+  clearError();
+  MY_NAME = v;
+  renderPendingBanner();
+}
+
+/* ---------------- helpers ---------------- */
+function esc(s) { return (s == null ? '' : String(s)).replace(/[&<>"']/g, function (c) {
+  return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+}); }
+function fmt(ts) { if (!ts) return '—'; const d = new Date(ts);
+  return d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+function isOverdue(s) { return s.status === 'issued' && s.expectedReturn && Date.now() > s.expectedReturn; }
+function fmtDuration(hrs) { const h = Math.abs(hrs);
+  if (h < 1) return Math.max(1, Math.round(h * 60)) + 'm';
+  if (h < 24) return Math.round(h) + 'h';
+  return Math.round(h / 24) + 'd'; }
+function dueLabel(s) { if (!s.expectedReturn) return 'No deadline set';
+  const diff = (s.expectedReturn - Date.now()) / 3600000;
+  return diff < 0 ? 'Overdue by ' + fmtDuration(diff) : 'Due in ' + fmtDuration(diff); }
+function todayStr() { const d = new Date(); const off = d.getTimezoneOffset();
+  return new Date(d.getTime() - off * 60000).toISOString().slice(0, 10); }
+function samplePhotos(s) { return (s.photos && s.photos.length) ? s.photos : []; }
+// Called via onerror on any photo/avatar <img>. A corrupt or truncated data
+// URL (e.g. a photo that got cut off hitting Google Sheets' 50,000-char
+// cell limit) fails silently as the browser's generic broken-image icon —
+// this swaps it for a clearly labeled placeholder instead.
+function markPhotoBroken(imgEl) {
+  const w = imgEl.offsetWidth || 56, h = imgEl.offsetHeight || 56;
+  const round = imgEl.style.borderRadius === '50%';
+  const div = document.createElement('div');
+  div.style.cssText = 'width:' + w + 'px;height:' + h + 'px;display:flex;align-items:center;justify-content:center;' +
+    'background:var(--paper-dim);border-radius:' + (round ? '50%' : '3px') + ';color:var(--red);font-size:11px;' +
+    'text-align:center;flex-shrink:0;border:1px solid var(--paper-line);';
+  div.title = 'Photo failed to load — please re-upload it';
+  div.textContent = '⚠';
+  if (imgEl.parentNode) imgEl.replaceWith(div);
+}
+function sealColor(label) { const m = SEAL_TYPES.find(function (t) { return t.label === label; }); return m ? m.color : '#999'; }
+function uniqueVals(key) { const set = {}; SAMPLES.forEach(function (s) { if (s[key]) set[s[key]] = 1; }); return Object.keys(set).sort(); }
+
+// Google Sheets cells hard-cap at 50,000 characters. A single photo's base64
+// data URL can easily exceed that, in which case Sheets silently truncates
+// it on save — producing a corrupt image that shows as a broken icon and
+// can never be viewed. So we compress, measure the actual result, and keep
+// shrinking until it's safely under the limit, instead of guessing a fixed
+// size/quality up front.
+//
+// IMPORTANT: the "Log Sample" and "Edit" photos are stored as a JSON array
+// in ONE shared sheet cell — so if a sample has several photos, they all
+// have to fit under 50,000 characters *together*, not 50,000 each. The
+// taker photo (issue form) has its own separate column, so it gets a
+// bigger budget.
+const PHOTO_MAX_CHARS_MULTI = 9000;   // per photo, when several share one cell
+const PHOTO_MAX_CHARS_SINGLE = 40000; // one photo alone in its own cell
+function readAndCompress(file, maxChars) {
+  maxChars = maxChars || PHOTO_MAX_CHARS_MULTI;
+  return new Promise(function (resolve, reject) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = new Image();
+      img.onload = function () {
+        let maxW = 480, quality = 0.6, attempts = 0;
+        function render() {
+          const scale = Math.min(1, maxW / img.width);
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.max(1, Math.round(img.width * scale));
+          canvas.height = Math.max(1, Math.round(img.height * scale));
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          return canvas.toDataURL('image/jpeg', quality);
+        }
+        let dataUrl = render();
+        while (dataUrl.length > maxChars && attempts < 10) {
+          if (quality > 0.3) quality -= 0.1; else maxW = Math.round(maxW * 0.8);
+          dataUrl = render();
+          attempts++;
+        }
+        if (dataUrl.length > maxChars) {
+          reject(new Error('This photo is too large to store even after compression. Try retaking it with better lighting or a simpler background.'));
+          return;
+        }
+        resolve(dataUrl);
+      };
+      img.onerror = function () { reject(new Error('Could not read this image file.')); };
+      img.src = e.target.result;
+    };
+    reader.onerror = function () { reject(new Error('Could not read this file.')); };
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ---------------- dashboard + banner ---------------- */
+function renderDashboard() {
+  const total = SAMPLES.length;
+  const issued = SAMPLES.filter(function (s) { return s.status === 'issued'; });
+  const overdue = issued.filter(isOverdue).length;
+  const cards = [
+    { label: 'Total samples', value: total, color: 'var(--text-on-ink)' },
+    { label: 'In store', value: total - issued.length, color: 'var(--green)' },
+    { label: 'Out', value: issued.length, color: 'var(--amber)' },
+    { label: 'Overdue', value: overdue, color: overdue ? 'var(--red)' : 'var(--amber)' }
+  ];
+  document.getElementById('dashboardBar').innerHTML = cards.map(function (c) {
+    return '<div class="statCard"><div class="statVal" style="color:' + c.color + '">' + c.value + '</div><div class="statLabel">' + c.label + '</div></div>';
+  }).join('');
+}
+
+function renderPendingBanner() {
+  if (!MY_NAME) { document.getElementById('pendingBanner').innerHTML = ''; return; }
+  const mine = SAMPLES.filter(function (s) { return s.status === 'issued' && (s.issuedTo || '').trim().toLowerCase() === MY_NAME.trim().toLowerCase(); });
+  if (!mine.length) { document.getElementById('pendingBanner').innerHTML = ''; return; }
+  document.getElementById('pendingBanner').innerHTML =
+    '<div class="banner"><p style="margin:0; font-weight:700; font-size:13px;">You have ' + mine.length + ' sample' + (mine.length > 1 ? 's' : '') + ' checked out</p>' +
+    '<p class="muted" style="margin-top:2px;">' + mine.map(function (s) { return esc(s.sealNumber); }).join(', ') + ' — return via Issue / Return when done.</p></div>';
+}
+
+/* ---------------- tabs ---------------- */
+function switchTab(t) {
+  CURRENT_TAB = t;
+  document.querySelectorAll('#tabBar .tab').forEach(function (el) { el.classList.toggle('active', el.dataset.tab === t); });
+  renderTab();
+}
+function renderTab() {
+  const el = document.getElementById('tabContent');
+  if (CURRENT_TAB === 'register') el.innerHTML = registerHtml();
+  else if (CURRENT_TAB === 'log') el.innerHTML = logHtml();
+  else if (CURRENT_TAB === 'action') el.innerHTML = actionHtml();
+  else if (CURRENT_TAB === 'supervisor') el.innerHTML = supervisorHtml();
+}
+
+/* ---------------- register tab ---------------- */
+function filterBarHtml(prefix, state, showStatus, showSampleType) {
+  const buyers = uniqueVals('buyer'), merchants = uniqueVals('merchant');
+  let html = '<div class="row" style="background:var(--paper); border-radius:4px; padding:6px 10px; margin-bottom:8px;">' +
+    '<input placeholder="Search product, seal #, PO / order #" value="' + esc(state.q) + '" oninput="' + prefix + 'SetQ(this.value)" style="background:transparent;border:none;padding:4px 0;">' +
+    '</div><div class="row" style="overflow-x:auto; gap:6px;">';
+  if (showStatus) {
+    html += '<select onchange="' + prefix + 'SetStatus(this.value)" style="width:auto;">' +
+      '<option value="all">All status</option><option value="in-room"' + (state.status === 'in-room' ? ' selected' : '') + '>In room</option>' +
+      '<option value="issued"' + (state.status === 'issued' ? ' selected' : '') + '>Issued</option></select>';
+  }
+  if (showSampleType) {
+    html += '<select onchange="' + prefix + 'SetSampleType(this.value)" style="width:auto;"><option value="all">All sample types</option>' +
+      SAMPLE_TYPES.map(function (t) { return '<option value="' + esc(t) + '"' + (state.sampleType === t ? ' selected' : '') + '>' + esc(t) + '</option>'; }).join('') + '</select>';
+  }
+  html += '<select onchange="' + prefix + 'SetBuyer(this.value)" style="width:auto;"><option value="all">All buyers</option>' +
+    buyers.map(function (b) { return '<option value="' + esc(b) + '"' + (state.buyer === b ? ' selected' : '') + '>' + esc(b) + '</option>'; }).join('') + '</select>';
+  html += '<select onchange="' + prefix + 'SetMerchant(this.value)" style="width:auto;"><option value="all">All merchants</option>' +
+    merchants.map(function (m) { return '<option value="' + esc(m) + '"' + (state.merchant === m ? ' selected' : '') + '>' + esc(m) + '</option>'; }).join('') + '</select>';
+  html += '</div>';
+  return html;
+}
+function regSetQ(v) { filters.q = v; renderRegisterList(); }
+function regSetStatus(v) { filters.status = v; renderTab(); }
+function regSetBuyer(v) { filters.buyer = v; renderTab(); }
+function regSetMerchant(v) { filters.merchant = v; renderTab(); }
+function regSetSampleType(v) { filters.sampleType = v; renderTab(); }
+
+function matchesFilters(s, f) {
+  const hay = [s.sealNumber, s.itemNumber, s.name, s.buyer, s.poNumber, s.merchant, s.location, s.sealType, s.sampleType]
+    .filter(Boolean).join(' ').toLowerCase();
+  const q = !f.q || hay.includes(f.q.toLowerCase());
+  const buyer = f.buyer === 'all' || s.buyer === f.buyer;
+  const merchant = f.merchant === 'all' || s.merchant === f.merchant;
+  const st = !f.sampleType || f.sampleType === 'all' || s.sampleType === f.sampleType;
+  const status = !f.status || f.status === 'all' || s.status === f.status;
+  return q && buyer && merchant && st && status;
+}
+
+function registerHtml() {
+  return '<div>' + filterBarHtml('reg', filters, true, true) +
+    '<div id="registerList"></div></div>' + (setTimeout(renderRegisterList, 0), '');
+}
+function renderRegisterList() {
+  const container = document.getElementById('registerList');
+  if (!container) return;
+  const filtered = SAMPLES.filter(function (s) { return matchesFilters(s, filters); });
+  let html = '<p class="mutedInk" style="margin:6px 0;">' + filtered.length + ' of ' + SAMPLES.length + ' samples</p>';
+  if (!filtered.length) { html += '<div class="empty">No samples match. Log one in the "Log Sample" tab.</div>'; }
+  html += filtered.map(sampleRowHtml).join('');
+  container.innerHTML = html;
+}
+
+function sampleRowHtml(s) {
+  const photos = samplePhotos(s);
+  const thumb = photos.length
+    ? '<button class="thumb" style="padding:0;border:none;position:relative;" onclick=\'openGallery(' + JSON.stringify(photos) + ')\'><img src="' + esc(photos[0]) + '" class="thumb" style="margin:0;" onerror="markPhotoBroken(this)">' +
+      (photos.length > 1 ? '<span style="position:absolute;bottom:-4px;right:-4px;background:var(--ink);color:var(--text-on-ink);font-size:9px;font-weight:700;padding:0 3px;border-radius:3px;">+' + (photos.length - 1) + '</span>' : '') + '</button>'
+    : '<div class="thumbEmpty">📷</div>';
+  const statusBadge = s.status === 'in-room'
+    ? '<span class="stampBadge" style="color:var(--green); border-color:var(--green);">In Room</span>'
+    : (isOverdue(s) ? '<span class="stampBadge" style="color:var(--red); border-color:var(--red);">Overdue</span>' : '<span class="stampBadge" style="color:var(--amber); border-color:var(--amber);">Issued</span>');
+  const metaLine = [s.buyer && ('Buyer: ' + s.buyer), s.poNumber && ('PO: ' + s.poNumber), s.merchant && ('Merchant: ' + s.merchant), s.itemNumber && ('RC: ' + s.itemNumber)]
+    .filter(Boolean).join(' · ');
+  const statusLine = s.status === 'in-room'
+    ? ('Logged ' + (s.sampleDate || '') + ' by ' + (s.loggedBy || '—'))
+    : ('Held by ' + esc(s.issuedTo) + (s.department ? ' (' + esc(s.department) + ')' : '') + ' · ' + dueLabel(s));
+
+  return '<div class="sampleRow">' + thumb +
+    '<div style="flex:1; min-width:0;">' +
+    '<div class="row between"><span style="font-weight:700; font-size:13px; font-family:monospace;">' +
+    (s.sealType ? '<span class="dot" style="background:' + sealColor(s.sealType) + ';margin-right:4px;"></span>' : '') +
+    esc(s.sealNumber) + '</span>' + statusBadge + '</div>' +
+    '<p style="margin:2px 0; font-weight:600; font-size:13px;">' + esc(s.name) + '</p>' +
+    (s.sampleType ? '<p class="muted" style="font-weight:600; color:var(--kraft); margin:0;">' + esc(s.sampleType) + '</p>' : '') +
+    (metaLine ? '<p class="muted" style="margin:2px 0;">' + esc(metaLine) + '</p>' : '') +
+    '<p class="muted" style="margin:2px 0;">' + statusLine + '</p>' +
+    '<div class="row between" style="margin-top:4px;">' +
+    '<button class="btn-ghost" style="font-size:11px; padding:3px 8px;" onclick="editLocation(\'' + s.id + '\')">📍 ' + esc(s.location || 'Set location') + '</button>' +
+    '<div class="row" style="gap:2px;">' +
+    '<button class="btn-icon" onclick="openLabel(\'' + s.id + '\')" title="Print label">🖨</button>' +
+    '<button class="btn-icon" onclick="openHistory(\'' + s.id + '\')" title="History">🕐</button>' +
+    '<button class="btn-icon" onclick="openEdit(\'' + s.id + '\')" title="Edit">✎</button>' +
+    '</div></div></div></div>';
+}
+
+async function editLocation(id) {
+  const s = SAMPLES.find(function (x) { return x.id === id; });
+  const val = prompt('Rack / location for this sample:', s.location || '');
+  if (val === null) return;
+  try {
+    await apiCall('updateSample', [id, { location: val.trim() }]);
+    clearError(); refreshAll();
+  } catch (err) { showError(err, 'Updating location'); }
+}
+
+/* ---------------- gallery / label / history / edit modals ---------------- */
+function closeModal() { document.getElementById('modalRoot').innerHTML = ''; }
+
+/* Cross-platform photo source picker.
+   iOS Safari shows "Take Photo" as an option on any accept="image/*" input
+   regardless of the capture attribute, but many Android browsers/WebViews
+   only surface the camera when capture is explicitly set — and setting it
+   unconditionally then hides the gallery option instead. So we keep two
+   real inputs (one with capture, one without) and let the user pick —
+   except on iOS/iPadOS, where the capture attribute is unreliable
+   (tapping "Take Photo" can silently do nothing, especially on iPad),
+   so there we skip our own chooser and just open the plain gallery
+   input: Safari's native file picker already offers "Take Photo or
+   Video / Photo Library / Browse" on its own, no capture attribute
+   needed. */
+function isIOS_() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+function openPhotoSourcePicker(cameraInputId, galleryInputId) {
+  if (isIOS_()) { document.getElementById(galleryInputId).click(); return; }
+  document.getElementById('modalRoot').innerHTML =
+    '<div class="modalBg" onclick="if(event.target===this) closeModal()"><div class="modal" style="text-align:center;">' +
+    '<p style="font-weight:700; margin-bottom:10px;">Add photo</p>' +
+    '<button class="btn-ghost" style="width:100%; margin-bottom:8px;" onclick="closeModal(); document.getElementById(\'' + cameraInputId + '\').click();">📷 Take Photo</button>' +
+    '<button class="btn-ghost" style="width:100%;" onclick="closeModal(); document.getElementById(\'' + galleryInputId + '\').click();">🖼 Choose from Library</button>' +
+    '</div></div>';
+}
+
+function openGallery(photos, startIndex) {
+  const start = startIndex || 0;
+  document.getElementById('modalRoot').innerHTML =
+    '<div class="modalBg" onclick="if(event.target===this) closeModal()"><div class="modal" style="text-align:center;">' +
+    '<div class="row between"><p style="font-weight:700;">Photo ' + (start + 1) + ' of ' + photos.length + '</p><button class="btn-icon" onclick="closeModal()">✕</button></div>' +
+    '<img src="' + esc(photos[start]) + '" style="width:100%; max-height:60vh; object-fit:contain; border-radius:4px; border:1px solid var(--paper-line); background:#000;" onerror="markPhotoBroken(this)">' +
+    (photos.length > 1 ?
+      '<div class="row between" style="margin-top:8px;">' +
+      '<button class="btn-ghost" onclick="openGallery(' + JSON.stringify(photos).replace(/"/g, '&quot;') + ',' + ((start - 1 + photos.length) % photos.length) + ')">‹ Prev</button>' +
+      '<button class="btn-ghost" onclick="openGallery(' + JSON.stringify(photos).replace(/"/g, '&quot;') + ',' + ((start + 1) % photos.length) + ')">Next ›</button>' +
+      '</div>' : '') +
+    '<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:10px;">' +
+    photos.map(function (p, i) { return '<img src="' + esc(p) + '" onclick="openGallery(' + JSON.stringify(photos).replace(/"/g, '&quot;') + ',' + i + ')" style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:4px; cursor:pointer; border:2px solid ' + (i === start ? 'var(--red)' : 'var(--paper-line)') + ';" onerror="markPhotoBroken(this)">'; }).join('') +
+    '</div></div></div>';
+}
+
+function openLabel(id) {
+  const s = SAMPLES.find(function (x) { return x.id === id; });
+  const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(s.sealNumber);
+  document.getElementById('modalRoot').innerHTML =
+    '<div class="modalBg" onclick="if(event.target===this) closeModal()"><div class="modal" style="text-align:center; background:#fff; color:#111;">' +
+    '<img src="' + qrUrl + '" style="margin:0 auto;">' +
+    '<p style="font-size:22px; font-weight:700; font-family:monospace; margin:8px 0 0;">' + esc(s.sealNumber) + '</p>' +
+    (s.sampleType ? '<p style="font-weight:600; color:#555;">' + esc(s.sampleType) + '</p>' : '') +
+    '<p style="margin:2px 0;">' + esc(s.name) + '</p>' +
+    '<div class="row" style="margin-top:12px;"><button class="btn-primary" onclick="window.print()">Print label</button>' +
+    '<button class="btn-ghost" onclick="closeModal()">Close</button></div></div></div>';
+}
+
+function openHistory(id) {
+  const s = SAMPLES.find(function (x) { return x.id === id; });
+  const entries = (s.history || []).slice().reverse();
+  const rows = entries.map(function (h) {
+    let detail = '';
+    if (h.type === 'logged') detail = 'Logged by ' + esc(h.by);
+    if (h.type === 'issued') detail = 'To ' + esc(h.to) + ' (' + esc(h.department) + ') by ' + esc(h.by) + (h.expectedReturn ? ' · due ' + fmt(h.expectedReturn) : '') + (h.note ? ' · ' + esc(h.note) : '');
+    if (h.type === 'returned') detail = 'Returned by ' + esc(h.by) + (h.from ? ' (was with ' + esc(h.from) + ')' : '');
+    const color = h.type === 'returned' ? 'var(--green)' : h.type === 'issued' ? 'var(--amber)' : 'var(--kraft)';
+    return '<div style="padding-left:10px; border-left:2px solid var(--paper-line); margin-bottom:8px;">' +
+      '<p style="font-size:11px; font-weight:700; text-transform:uppercase; color:' + color + '; margin:0;">' + h.type + '</p>' +
+      '<p class="muted" style="margin:0;">' + fmt(h.at) + '</p><p style="font-size:12px; margin:2px 0;">' + detail + '</p></div>';
+  }).join('');
+  document.getElementById('modalRoot').innerHTML =
+    '<div class="modalBg" onclick="if(event.target===this) closeModal()"><div class="modal">' +
+    '<div class="row between"><p style="font-weight:700;">History · ' + esc(s.sealNumber) + '</p><button class="btn-icon" onclick="closeModal()">✕</button></div>' +
+    (rows || '<p class="muted">No history yet.</p>') + '</div></div>';
+}
+
+let editPhotos = [];
+function openEdit(id) {
+  const s = SAMPLES.find(function (x) { return x.id === id; });
+  editPhotos = samplePhotos(s).slice();
+  document.getElementById('modalRoot').innerHTML =
+    '<div class="modalBg" onclick="if(event.target===this) closeModal()"><div class="modal">' +
+    '<div class="row between"><p style="font-weight:700;">Edit sample</p><button class="btn-icon" onclick="closeModal()">✕</button></div>' +
+    '<label class="field">Photos</label><div id="editPhotoArea"></div>' +
+    '<input type="file" id="editPhotoInputCamera" accept="image/*" capture="environment" style="display:none;" onchange="handleEditPhotos(event)">' +
+    '<input type="file" id="editPhotoInputGallery" accept="image/*" multiple style="display:none;" onchange="handleEditPhotos(event)">' +
+    fieldHtml('Seal number', 'input', 'editSealNumber', s.sealNumber) +
+    '<div class="grid2">' +
+    selectFieldHtml('Seal type', 'editSealType', SEAL_TYPES.map(function (t) { return t.label; }), s.sealType) +
+    selectFieldHtml('Sample type', 'editSampleType', SAMPLE_TYPES, s.sampleType) + '</div>' +
+    fieldHtml('Sample name', 'input', 'editName', s.name) +
+    '<div class="grid2">' +
+    fieldHtml('Buyer', 'input', 'editBuyer', s.buyer) +
+    fieldHtml('PO number', 'input', 'editPo', s.poNumber) +
+    fieldHtml('Merchant', 'input', 'editMerchant', s.merchant) +
+    fieldHtml('RC / Item No.', 'input', 'editItem', s.itemNumber) +
+    fieldHtml('Location', 'input', 'editLoc', s.location) + '</div>' +
+    fieldHtml('Notes', 'textarea', 'editDesc', s.description) +
+    '<div class="row" style="margin-top:8px;">' +
+    '<button class="btn-primary" id="saveEditBtn" onclick="saveEdit(\'' + id + '\')">Save changes</button>' +
+    '<button class="btn-red" onclick="deleteSampleConfirm(\'' + id + '\')">🗑</button>' +
+    '</div></div></div>';
+  renderEditPhotos();
+}
+function fieldHtml(label, tag, id, val) {
+  if (tag === 'textarea') return '<div><label class="field">' + label + '</label><textarea id="' + id + '" rows="2">' + esc(val || '') + '</textarea></div>';
+  return '<div><label class="field">' + label + '</label><input id="' + id + '" value="' + esc(val || '') + '"></div>';
+}
+function selectFieldHtml(label, id, options, selected) {
+  return '<div><label class="field">' + label + '</label><select id="' + id + '">' +
+    options.map(function (o) { return '<option value="' + esc(o) + '"' + (o === selected ? ' selected' : '') + '>' + esc(o) + '</option>'; }).join('') + '</select></div>';
+}
+function renderEditPhotos() {
+  const area = document.getElementById('editPhotoArea'); if (!area) return;
+  area.innerHTML = editPhotos.map(function (p, i) {
+    return '<div class="photoThumb"><img src="' + esc(p) + '" onclick="openGallery(editPhotos,' + i + ')" style="cursor:pointer;" onerror="markPhotoBroken(this)"><button class="rm" onclick="removeEditPhoto(' + i + ')">✕</button></div>';
+  }).join('') + '<div class="photoThumb"><button class="addPhotoBtn" onclick="openPhotoSourcePicker(\'editPhotoInputCamera\',\'editPhotoInputGallery\')">📷 Add</button></div>';
+}
+function removeEditPhoto(i) { editPhotos.splice(i, 1); renderEditPhotos(); }
+async function handleEditPhotos(e) {
+  const files = Array.from(e.target.files || []);
+  for (const f of files) {
+    try { editPhotos.push(await readAndCompress(f)); }
+    catch (err) { alert('Could not add photo: ' + (err && err.message ? err.message : err)); }
+  }
+  renderEditPhotos();
+  e.target.value = '';
+}
+function saveEdit(id) {
+  const patch = {
+    sealNumber: document.getElementById('editSealNumber').value.trim(),
+    sealType: document.getElementById('editSealType').value,
+    sampleType: document.getElementById('editSampleType').value,
+    name: document.getElementById('editName').value.trim(),
+    buyer: document.getElementById('editBuyer').value.trim(),
+    poNumber: document.getElementById('editPo').value.trim(),
+    merchant: document.getElementById('editMerchant').value.trim(),
+    itemNumber: document.getElementById('editItem').value.trim(),
+    location: document.getElementById('editLoc').value.trim(),
+    description: document.getElementById('editDesc').value.trim(),
+    photos: editPhotos
+  };
+  if (!patch.sealNumber || !patch.name) { alert('Seal number and sample name are required.'); return; }
+  const btn = document.getElementById('saveEditBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  apiCall('updateSample', [id, patch]).then(function () {
+    clearError(); closeModal(); refreshAll();
+  }).catch(function (err) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Save changes'; }
+    showError(err, 'Saving sample');
+  });
+}
+async function deleteSampleConfirm(id) {
+  if (!confirm('Delete this sample entry permanently?')) return;
+  try {
+    await apiCall('deleteSample', [id]);
+    clearError(); closeModal(); refreshAll();
+  } catch (err) { showError(err, 'Deleting sample'); }
+}
+
+/* ---------------- log sample tab ---------------- */
+function logHtml() {
+  return '<div class="card">' +
+    '<h2 style="font-size:14px; margin:0 0 10px;">Log a new sample</h2>' +
+    fieldHtml('Seal number *', 'input', 'logSeal', '') +
+    '<div class="grid2">' + selectFieldHtml('Seal type', 'logSealType', SEAL_TYPES.map(function (t) { return t.label; }), SEAL_TYPES[0].label) +
+    selectFieldHtml('Sample type', 'logSampleType', SAMPLE_TYPES, SAMPLE_TYPES[0]) + '</div>' +
+    fieldHtml('Sample name / source *', 'input', 'logName', '') +
+    '<div class="grid2">' +
+    '<div><label class="field">Date</label><input type="date" id="logDate" value="' + todayStr() + '"></div>' +
+    fieldHtml('PO number', 'input', 'logPo', '') +
+    fieldHtml('Buyer name', 'input', 'logBuyer', '') +
+    fieldHtml('Merchant', 'input', 'logMerchant', '') +
+    fieldHtml('RC / Item No.', 'input', 'logItem', '') +
+    fieldHtml('Rack / location', 'input', 'logLoc', '') + '</div>' +
+    fieldHtml('Notes', 'textarea', 'logDesc', '') +
+    '<label class="field" style="margin-top:8px;">Photos</label><div id="logPhotoArea"></div>' +
+    '<input type="file" id="logPhotoInputCamera" accept="image/*" capture="environment" style="display:none;" onchange="handleLogPhotos(event)">' +
+    '<input type="file" id="logPhotoInputGallery" accept="image/*" multiple style="display:none;" onchange="handleLogPhotos(event)">' +
+    '<button class="btn-primary" id="submitLogBtn" style="margin-top:12px;" onclick="submitLog()">🖋 Log sample into register</button>' +
+    '</div>' + (setTimeout(renderLogPhotos, 0), '');
+}
+function renderLogPhotos() {
+  const area = document.getElementById('logPhotoArea'); if (!area) return;
+  area.innerHTML = logPhotos.map(function (p, i) {
+    return '<div class="photoThumb"><img src="' + esc(p) + '" onclick="openGallery(logPhotos,' + i + ')" style="cursor:pointer;" onerror="markPhotoBroken(this)"><button class="rm" onclick="removeLogPhoto(' + i + ')">✕</button></div>';
+  }).join('') + '<div class="photoThumb"><button class="addPhotoBtn" onclick="openPhotoSourcePicker(\'logPhotoInputCamera\',\'logPhotoInputGallery\')">📷 Add</button></div>';
+}
+function removeLogPhoto(i) { logPhotos.splice(i, 1); renderLogPhotos(); }
+async function handleLogPhotos(e) {
+  const files = Array.from(e.target.files || []);
+  for (const f of files) {
+    try { logPhotos.push(await readAndCompress(f)); }
+    catch (err) { alert('Could not add photo: ' + (err && err.message ? err.message : err)); }
+  }
+  renderLogPhotos();
+  e.target.value = '';
+}
+function submitLog() {
+  const sealNumber = document.getElementById('logSeal').value.trim();
+  const name = document.getElementById('logName').value.trim();
+  if (!sealNumber || !name) { alert('Seal number and sample name are required.'); return; }
+  const sample = {
+    sealNumber: sealNumber,
+    sealType: document.getElementById('logSealType').value,
+    sampleType: document.getElementById('logSampleType').value,
+    name: name,
+    sampleDate: document.getElementById('logDate').value,
+    buyer: document.getElementById('logBuyer').value.trim(),
+    poNumber: document.getElementById('logPo').value.trim(),
+    merchant: document.getElementById('logMerchant').value.trim(),
+    itemNumber: document.getElementById('logItem').value.trim(),
+    location: document.getElementById('logLoc').value.trim(),
+    description: document.getElementById('logDesc').value.trim(),
+    photos: logPhotos,
+    loggedBy: MY_NAME || 'Unknown'
+  };
+  const btn = document.getElementById('submitLogBtn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Logging…'; }
+  apiCall('addSample', [sample]).then(function () {
+    clearError();
+    logPhotos = [];
+    switchTab('register');
+    refreshAll();
+  }).catch(function (err) {
+    if (btn) { btn.disabled = false; btn.textContent = '🖋 Log sample into register'; }
+    showError(err, 'Logging sample');
+  });
+}
+
+/* ---------------- issue / return tab ---------------- */
+let actionMode = 'issue';
+function actionHtml() {
+  const inRoomTotal = SAMPLES.filter(function (s) { return s.status === 'in-room'; }).length;
+  const issuedTotal = SAMPLES.filter(function (s) { return s.status === 'issued'; }).length;
+  return '<div>' +
+    '<div class="row" style="margin-bottom:8px;">' +
+    '<button class="tab ' + (actionMode === 'issue' ? 'active' : '') + '" onclick="setActionMode(\'issue\')">Issue (' + inRoomTotal + ')</button>' +
+    '<button class="tab ' + (actionMode === 'return' ? 'active' : '') + '" onclick="setActionMode(\'return\')">Return (' + issuedTotal + ')</button>' +
+    '</div>' + filterBarHtml('act', actionFilters, false, false) +
+    '<div id="actionList"></div></div>' + (setTimeout(renderActionList, 0), '');
+}
+function actSetQ(v) { actionFilters.q = v; renderActionList(); }
+function actSetBuyer(v) { actionFilters.buyer = v; renderTab(); }
+function actSetMerchant(v) { actionFilters.merchant = v; renderTab(); }
+function setActionMode(m) { actionMode = m; renderTab(); }
+
+function renderActionList() {
+  const container = document.getElementById('actionList'); if (!container) return;
+  if (actionMode === 'issue') {
+    const list = SAMPLES.filter(function (s) { return s.status === 'in-room' && matchesFilters(s, Object.assign({}, actionFilters, { status: 'all', sampleType: 'all' })); });
+    container.innerHTML = list.length ? list.map(issueRowHtml).join('') : '<div class="empty">No samples match.</div>';
+  } else {
+    const list = SAMPLES.filter(function (s) { return s.status === 'issued' && matchesFilters(s, Object.assign({}, actionFilters, { status: 'all', sampleType: 'all' })); });
+    container.innerHTML = list.length ? list.map(returnRowHtml).join('') : '<div class="empty">Nothing checked out.</div>';
+  }
+}
+
+function deadlinePresets() {
+  const now = Date.now();
+  const eod = new Date(); eod.setHours(18, 0, 0, 0);
+  const tmr = new Date(); tmr.setDate(tmr.getDate() + 1); tmr.setHours(10, 0, 0, 0);
+  return [
+    { label: '2 hours', ts: now + 2 * 3600000 }, { label: '4 hours', ts: now + 4 * 3600000 },
+    { label: 'End of day', ts: eod.getTime() > now ? eod.getTime() : now + 4 * 3600000 },
+    { label: 'Tomorrow 10am', ts: tmr.getTime() }
+  ];
+}
+let issueOpenId = null, issueDeadline = null;
+function issueRowHtml(s) {
+  const open = issueOpenId === s.id;
+  let form = '';
+  if (open) {
+    const presets = deadlinePresets();
+    const photo = issuePhotoCache[s.id];
+    form = '<div style="margin-top:8px;">' +
+      '<input id="taker_' + s.id + '" placeholder="Who is taking this sample?">' +
+      '<select id="dept_' + s.id + '" style="margin-top:6px;">' + DEPARTMENTS.map(function (d) { return '<option value="' + d + '">' + d + '</option>'; }).join('') + '</select>' +
+      '<label class="field" style="margin-top:8px;">Photo of person taking it</label>' +
+      '<div class="row">' + (photo ? '<img src="' + photo + '" style="width:52px;height:52px;border-radius:50%;object-fit:cover;" onerror="markPhotoBroken(this)">' : '<div class="avatarEmpty">📷</div>') +
+      '<button class="btn-ghost" onclick="openPhotoSourcePicker(\'takerPhotoInputCamera_' + s.id + '\',\'takerPhotoInputGallery_' + s.id + '\')">' + (photo ? 'Retake' : 'Add photo') + '</button>' +
+      '<input type="file" id="takerPhotoInputCamera_' + s.id + '" accept="image/*" capture="user" style="display:none;" onchange="handleTakerPhoto(event,\'' + s.id + '\')">' +
+      '<input type="file" id="takerPhotoInputGallery_' + s.id + '" accept="image/*" style="display:none;" onchange="handleTakerPhoto(event,\'' + s.id + '\')"></div>' +
+      '<label class="field" style="margin-top:8px;">Must be returned by</label>' +
+      '<div class="row" style="flex-wrap:wrap;">' + presets.map(function (p) {
+        const sel = issueDeadline === p.ts;
+        return '<button class="btn-ghost" style="' + (sel ? 'background:var(--ink);color:var(--text-on-ink);' : '') + '" onclick="pickDeadline(\'' + s.id + '\',' + p.ts + ')">' + p.label + '</button>';
+      }).join('') + '</div>' +
+      (issueDeadline ? '<p class="muted">Deadline: ' + fmt(issueDeadline) + '</p>' : '') +
+      '<input id="note_' + s.id + '" placeholder="Reason / note (optional)" style="margin-top:6px;">' +
+      '<p class="muted" style="color:var(--red); margin-top:6px;">⚠ This sample must stay on factory premises and be returned by the deadline above.</p>' +
+      '<button class="btn-primary" id="confirmIssueBtn_' + s.id + '" style="margin-top:8px;" onclick="confirmIssue(\'' + s.id + '\')">Confirm hand-off</button>' +
+      '</div>';
+  }
+  return '<div class="sampleRow" style="flex-direction:column;">' +
+    '<div class="row between" style="width:100%;"><div><span style="font-weight:700; font-family:monospace; font-size:13px;">' + esc(s.sealNumber) + '</span>' +
+    '<p style="margin:2px 0; font-size:13px;">' + esc(s.name) + '</p></div>' +
+    '<button class="btn-amber" onclick="toggleIssue(\'' + s.id + '\')">Issue ' + (open ? '▲' : '▶') + '</button></div>' + form + '</div>';
+}
+function toggleIssue(id) { issueOpenId = (issueOpenId === id ? null : id); issueDeadline = null; renderActionList(); }
+function pickDeadline(id, ts) { issueDeadline = ts; renderActionList(); }
+async function handleTakerPhoto(e, id) {
+  const f = e.target.files[0]; if (!f) return;
+  try { issuePhotoCache[id] = await readAndCompress(f, PHOTO_MAX_CHARS_SINGLE); }
+  catch (err) { alert('Could not add photo: ' + (err && err.message ? err.message : err)); }
+  renderActionList();
+}
+function confirmIssue(id) {
+  const taker = document.getElementById('taker_' + id).value.trim();
+  if (!taker || !issueDeadline) { alert('Enter who is taking it and pick a return deadline.'); return; }
+  const department = document.getElementById('dept_' + id).value;
+  const note = document.getElementById('note_' + id).value.trim();
+  const photo = issuePhotoCache[id] || null;
+  const btn = document.getElementById('confirmIssueBtn_' + id);
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  apiCall('issueSample', [id, taker, department, issueDeadline, note, photo, MY_NAME || taker]).then(function () {
+    clearError();
+    issueOpenId = null; issueDeadline = null; delete issuePhotoCache[id];
+    refreshAll();
+  }).catch(function (err) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Confirm hand-off'; }
+    showError(err, 'Issuing sample');
+  });
+}
+
+function returnRowHtml(s) {
+  const overdue = isOverdue(s);
+  const avatar = s.takerPhoto ? '<img src="' + esc(s.takerPhoto) + '" class="avatar" style="border:2px solid ' + (overdue ? 'var(--red)' : 'var(--amber)') + ';" onerror="markPhotoBroken(this)">' : '<div class="avatarEmpty">👤</div>';
+  return '<div class="sampleRow"><div class="row" style="flex:1;">' + avatar +
+    '<div style="flex:1; min-width:0;"><span style="font-weight:700; font-family:monospace; font-size:13px;">' + esc(s.sealNumber) + '</span>' +
+    '<p style="margin:2px 0; font-size:13px;">' + esc(s.name) + '</p>' +
+    '<p class="muted" style="margin:0;">With ' + esc(s.issuedTo) + (s.department ? ' (' + esc(s.department) + ')' : '') + '</p>' +
+    '<p style="font-size:11px; font-weight:700; margin:0; color:' + (overdue ? 'var(--red)' : 'var(--amber)') + ';">' + dueLabel(s) + '</p></div></div>' +
+    '<button class="btn-green" onclick="confirmReturn(\'' + s.id + '\')">✓ Returned</button></div>';
+}
+async function confirmReturn(id) {
+  try {
+    await apiCall('returnSample', [id, MY_NAME || 'Unknown']);
+    clearError(); refreshAll();
+  } catch (err) { showError(err, 'Returning sample'); }
+}
+
+/* ---------------- supervisor tab ---------------- */
+function supervisorHtml() {
+  const issued = SAMPLES.filter(function (s) { return s.status === 'issued'; })
+    .sort(function (a, b) { return (a.expectedReturn || Infinity) - (b.expectedReturn || Infinity); });
+  const overdue = issued.filter(isOverdue).length;
+  const inRoom = SAMPLES.length - issued.length;
+  let html = '<div class="grid4" style="grid-template-columns:repeat(3,1fr); margin-bottom:12px;">' +
+    '<div class="statCard"><div class="statVal">' + SAMPLES.length + '</div><div class="statLabel">Total logged</div></div>' +
+    '<div class="statCard"><div class="statVal" style="color:var(--green);">' + inRoom + '</div><div class="statLabel">In room</div></div>' +
+    '<div class="statCard"><div class="statVal" style="color:' + (overdue ? 'var(--red)' : 'var(--amber)') + ';">' + overdue + '</div><div class="statLabel">Overdue</div></div></div>';
+  if (!issued.length) { html += '<div class="empty">Nothing outstanding. All samples accounted for.</div>'; }
+  html += issued.map(function (s) {
+    const late = isOverdue(s);
+    const avatar = s.takerPhoto ? '<img src="' + esc(s.takerPhoto) + '" class="avatar" style="border:2px solid ' + (late ? 'var(--red)' : 'var(--amber)') + ';" onerror="markPhotoBroken(this)">' : '<div class="avatarEmpty">👤</div>';
+    return '<div class="sampleRow" style="border-left:4px solid ' + (late ? 'var(--red)' : 'var(--amber)') + ';">' + avatar +
+      '<div style="flex:1; min-width:0;"><div class="row between"><span style="font-weight:700; font-family:monospace; font-size:13px;">' + esc(s.sealNumber) + '</span>' +
+      '<span style="font-size:11px; font-weight:700; color:' + (late ? 'var(--red)' : 'var(--amber)') + ';">⏱ ' + dueLabel(s) + '</span></div>' +
+      '<p style="margin:2px 0; font-size:13px;">' + esc(s.name) + '</p>' +
+      '<p class="muted" style="margin:0;">Held by <b>' + esc(s.issuedTo) + '</b>' + (s.department ? ' · ' + esc(s.department) : '') + ' · out since ' + fmt(s.issuedAt) + (s.issueNote ? ' · ' + esc(s.issueNote) : '') + '</p></div></div>';
+  }).join('');
+  return html;
+}
+</script>
+</body>
+</html>

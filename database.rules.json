@@ -1,0 +1,16 @@
+{
+  "rules": {
+    "samples": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      "$sampleId": {
+        "id": {
+          ".validate": "newData.val() === $sampleId"
+        },
+        "status": {
+          ".validate": "newData.val() === 'in-room' || newData.val() === 'issued'"
+        }
+      }
+    }
+  }
+}
