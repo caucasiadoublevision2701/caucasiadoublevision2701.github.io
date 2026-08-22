@@ -15,7 +15,8 @@
     body { margin: 0; background: var(--ink); color: var(--text-on-ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-text-size-adjust:100%; }
     h1, .display { font-family: Georgia, 'Times New Roman', serif; }
     .wrap { max-width: 1120px; margin: 0 auto; padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(60px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
-    .row { display: flex; align-items: center; gap: 8px; }
+    .row { display: flex; align-items: center; gap: 0; }
+    .row > * + * { margin-left:8px; }
     .between { justify-content: space-between; }
     .card { background: var(--paper); color: var(--text-on-paper); border-radius: 4px; padding: 12px; }
     .muted { color: var(--text-on-paper-dim); font-size: 12px; }
@@ -36,13 +37,16 @@
     .btn-green { background: var(--green); color: var(--paper); padding: 8px 12px; font-size: 12px; }
     .btn-ghost { background: var(--paper-dim); color: var(--text-on-paper); padding: 8px 12px; font-size: 12px; }
     .btn-red { background: var(--red); color: var(--paper); padding: 8px 12px; font-size: 12px; }
-    .appHeader { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 0 16px; border-bottom:1px solid #444; }
-    .brandBlock { display:flex; align-items:center; gap:12px; min-width:0; }
+    .appHeader { display:flex; align-items:center; justify-content:space-between; gap:0; padding:14px 0 16px; border-bottom:1px solid #444; }
+    .appHeader > * + * { margin-left:16px; }
+    .brandBlock { display:flex; align-items:center; gap:0; min-width:0; }
+    .brandBlock > * + * { margin-left:12px; }
     .brandLogo { height:34px; width:auto; filter:grayscale(1) contrast(1.2); }
     .brandBlock img { height:38px !important; width:auto !important; max-width:160px; }
-    .brandTitle { font-size:clamp(18px, 3vw, 26px); margin:0; line-height:1.1; }
+    .brandTitle { font-size:22px; font-size:clamp(18px, 3vw, 26px); margin:0; line-height:1.1; }
     .brandSub { color:var(--text-on-ink-dim); font-size:11px; text-transform:uppercase; letter-spacing:.12em; margin:4px 0 0; }
-    .headerActions { display:flex; align-items:center; gap:8px; }
+    .headerActions { display:flex; align-items:center; gap:0; }
+    .headerActions > * + * { margin-left:8px; }
     .headerBtn { min-height:44px; padding:10px 14px; border:1px solid #fff; background:#fff; color:#000; font-size:13px; white-space:nowrap; }
     .headerBtn.secondary { background:#000; color:#fff; }
     .menuToggle { display:none; }
@@ -57,7 +61,8 @@
     .thumb { width: 56px; height: 56px; object-fit: cover; border-radius: 3px; border: 1px solid var(--paper-line); flex-shrink: 0; }
     .thumbEmpty { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;
       background: var(--paper-dim); border-radius: 3px; color: var(--text-on-paper-dim); font-size: 20px; flex-shrink: 0; }
-    .sampleRow { display: flex; gap: 10px; background: var(--paper); border-radius: 4px; padding: 10px; margin-bottom: 8px; }
+    .sampleRow { display: flex; gap: 0; background: var(--paper); border-radius: 4px; padding: 10px; margin-bottom: 8px; }
+    .sampleRow > * + * { margin-left:10px; }
     .modalBg { position: fixed; inset: 0; background: rgba(0,0,0,.65); display: flex; align-items: center;
       justify-content: center; padding: 16px; z-index: 50; }
     .modal { width: 100%; max-width: 380px; max-height: 85vh; overflow-y: auto; background: var(--paper);
@@ -70,7 +75,7 @@
       justify-content: center; background: var(--paper-dim); border: 1px dashed var(--paper-line); border-radius: 3px;
       color: var(--text-on-paper-dim); font-size: 10px; }
     .statCard { background: var(--paper); border:1px solid #fff; border-radius: 8px; padding: 16px 10px; text-align: center; }
-    .statVal { font-size: clamp(24px, 5vw, 34px); font-weight: 800; font-family: Georgia, serif; color:#000 !important; }
+    .statVal { font-size:28px; font-size: clamp(24px, 5vw, 34px); font-weight: 800; font-family: Georgia, serif; color:#000 !important; }
     .statLabel { font-size: 9px; text-transform: uppercase; letter-spacing: .05em; color: var(--text-on-paper-dim); margin-top: 2px; }
     .empty { text-align: center; padding: 40px 12px; color: var(--text-on-ink-dim); font-size: 13px; }
     .banner { background: var(--paper); border-left: 4px solid var(--amber); border-radius: 4px; padding: 10px 14px; margin-bottom: 12px; }
@@ -80,7 +85,7 @@
       align-items: center; justify-content: center; color: var(--text-on-paper-dim); flex-shrink: 0; }
     .loading { text-align: center; padding: 60px 0; color: var(--text-on-ink-dim); }
     .loginScreen { min-height:100vh; min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:24px; background:#000; }
-    .loginCard { width:100%; max-width:400px; background:var(--paper); color:var(--text-on-paper); padding:clamp(24px, 6vw, 36px); border-radius:12px; border:1px solid #fff; box-shadow:0 20px 60px rgba(255,255,255,.12); }
+    .loginCard { width:100%; max-width:400px; background:var(--paper); color:var(--text-on-paper); padding:28px; padding:clamp(24px, 6vw, 36px); border-radius:12px; border:1px solid #fff; box-shadow:0 20px 60px rgba(255,255,255,.12); }
     .loginCard h1 { margin:0 0 6px; text-align:center; }
     .loginCard input { margin-top:10px; }
     .loginError { color:var(--red); font-size:12px; min-height:18px; margin:8px 0 0; }
@@ -92,6 +97,7 @@
       .brandLogo { height:28px; max-width:105px; object-fit:contain; }
       .menuToggle { display:inline-flex; align-items:center; justify-content:center; width:44px; padding:0; background:#fff; color:#000; border:1px solid #fff; }
       .headerActions { width:100%; display:grid; grid-template-columns:1fr 1fr; }
+      .headerActions > * + * { margin-left:0; }
       .tabs { display:none; grid-template-columns:1fr; position:relative; margin-top:10px; }
       .tabs.open { display:grid; }
       .tab { width:100%; text-align:left; padding:12px 14px; }
@@ -99,6 +105,10 @@
       .grid2 { grid-template-columns:1fr; }
       .sampleRow { align-items:flex-start; flex-wrap:wrap; }
       input, select, textarea { font-size:16px; min-height:44px; }
+      .tabs, .modal, body { -webkit-overflow-scrolling:touch; }
+    }
+    @supports not (padding: max(0px)) {
+      .wrap { padding:16px 16px 60px; }
     }
     @media (min-width: 701px) {
       #tabBar { display:grid !important; }
